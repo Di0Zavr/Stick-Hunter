@@ -10,7 +10,7 @@ class Player:
         self.x = x
         self.y = y
         self.is_jump = False
-        self.is_shoot = False
+        self.shot_lock = True
         self.jump_height = 0
         self.sprites = [
             pygame.image.load('materials/images/character/combine/player_combine_right.png').convert_alpha(),
@@ -27,20 +27,20 @@ class Player:
     def move_left(self, edge):
         self.x = max(self.x - self.speed, edge)
 
-    def jump(self, gravity):
+    def jump(self, gravity, ground_level):  # заметить граунд-левел на пересечение колайдеров
         if not self.is_jump:
             self.jump_height = 7
             self.is_jump = True
         else:
-            self.y = min(self.y - (self.jump_height**3)//6, 680)
+            self.y = min(self.y - (self.jump_height**3)//6, ground_level)
             self.jump_height -= gravity
-            if self.y == 680:
+            if self.y == ground_level:
                 self.is_jump = False
                 self.jump_height = 0
 
     def single_shot(self, array):
-        if not self.is_shoot and self.ammo:
-            self.is_shoot = True
+        if not self.shot_lock and self.ammo:
+            self.shot_lock = True
             self.ammo -= 1
             bullet = Bullet(direction=self.direction, x=self.x + (1 - self.direction) * 33, y=self.y + 13)
             array.append(bullet)
@@ -48,7 +48,7 @@ class Player:
                 pygame.time.set_timer(self.reload_timer, 1000)
 
     def unlock_gun(self):
-        self.is_shoot = False
+        self.shot_lock = False
 
     def reload(self, surf):
         if not self.ammo:
