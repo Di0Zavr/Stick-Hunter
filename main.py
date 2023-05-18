@@ -223,8 +223,13 @@ class Game:
             if not (-20 <= bullet.x <= 1300):
                 self.enemy_bullets_on_screen.remove(bullet)
                 continue
-            bullet.x += (1 - 2 * bullet.direction) * bullet.speed
             self.screen.blit(bullet.sprites[bullet.direction], (bullet.x, bullet.y))
+            bullet.x += (1 - 2 * bullet.direction) * bullet.speed
+            bullet.get_hitbox()
+            if self.player.hitbox.colliderect(bullet.hitbox):
+                self.player.health -= 1
+                self.enemy_bullets_on_screen.remove(bullet)
+                del bullet
 
     def check_gameplay_events(self):
         for event in pygame.event.get():
