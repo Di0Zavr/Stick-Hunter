@@ -11,6 +11,12 @@ class EnemyBullet:
             pygame.image.load('materials/images/enemies/bullet/enemy_bullet_right.png').convert_alpha(),
             pygame.image.load('materials/images/enemies/bullet/enemy_bullet_left.png').convert_alpha()
         ]
+        self.hitbox = None
+        self.get_hitbox()
+
+    def get_hitbox(self):
+        top_left = (self.x + (1 - self.direction) * 7, self.y)
+        self.hitbox = pygame.Rect(top_left, (8, 8))
 
 class LowTurret:
     def __init__(self, x, y):
@@ -24,7 +30,11 @@ class LowTurret:
         self.reload_time = 1600
         self.timer = None
         self.health = 6
+        self.hitbox = pygame.Rect((self.x, self.y), (50, 24))
 
     def shot(self, array):
         bullet = EnemyBullet(direction=self.direction, x=self.x + (1 - self.direction) * 50, y=self.y - 1)
         array.append(bullet)
+
+    def get_hitbox(self):
+        self.hitbox = pygame.Rect((self.x, self.y), (50, 24))

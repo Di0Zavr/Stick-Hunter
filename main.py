@@ -158,14 +158,6 @@ class Game:
         if not self.player.ammo:
             self.player.show_reload(self.screen)
 
-    def check_player_bullets(self):
-        for bl in self.bullets_on_screen:
-            if not -20 <= bl.x <= 1300:
-                self.bullets_on_screen.remove(bl)
-                continue
-            self.screen.blit(bl.sprites[bl.direction], (bl.x, bl.y))
-            bl.x += (1 - 2 * bl.direction) * bl.speed
-
     def check_inputs_gameplay(self):
         keys = pygame.key.get_pressed()
         mouse_click = pygame.mouse.get_pressed()
@@ -203,6 +195,14 @@ class Game:
         for enemy in self.enemies_on_screen:
             self.screen.blit(enemy.sprites[enemy.direction], (enemy.x, enemy.y))
             enemy.direction = 0 if self.player.x >= enemy.x else 1
+
+    def check_player_bullets(self):
+        for bl in self.bullets_on_screen:
+            if not -20 <= bl.x <= 1300:
+                self.bullets_on_screen.remove(bl)
+                continue
+            self.screen.blit(bl.sprites[bl.direction], (bl.x, bl.y))
+            bl.x += (1 - 2 * bl.direction) * bl.speed
 
     def check_enemy_bullets(self):
         for bullet in self.enemy_bullets_on_screen:

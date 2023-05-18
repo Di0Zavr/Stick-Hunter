@@ -19,7 +19,7 @@ class Player:
         ]
         self.bullet_icon = pygame.image.load('materials/images/character/bullet/bullet_icon.png').convert_alpha()
         self.reload_icon = pygame.image.load('materials/images/reload_message.png').convert_alpha()
-        self.hitbox = self.sprites[self.direction].get_rect(topleft=(self.x, self.y))
+        self.hitbox = pygame.Rect((self.x, self.y), (16, 33))
         self.reload_timer = pygame.USEREVENT + 1
 
     def move_right(self, edge):
@@ -62,6 +62,10 @@ class Player:
     def show_reload(self, surf):
         surf.blit(self.reload_icon, (980, 150))
 
+    def get_hitbox(self):
+        top_left = (self.x + self.direction * 18, self.y)
+        self.hitbox = pygame.Rect(top_left, (16, 33))
+
 class Bullet:
     def __init__(self, direction, x, y):
         self.speed = 12
@@ -72,3 +76,9 @@ class Bullet:
             pygame.image.load('materials/images/character/bullet/bullet_right.png').convert_alpha(),
             pygame.image.load('materials/images/character/bullet/bullet_left.png').convert_alpha()
         ]
+        self.hitbox = None
+        self.get_hitbox()
+
+    def get_hitbox(self):
+        top_left = (self.x + (1 - self.direction) * 11, self.y)
+        self.hitbox = pygame.Rect(top_left, (7, 7))
