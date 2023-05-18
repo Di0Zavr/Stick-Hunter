@@ -243,6 +243,12 @@ class Game:
                     enemy.shot(self.enemy_bullets_on_screen)
                     break
 
+    def check_player_health(self):
+        if self.player.health <= 0:
+            self.scene = 'lose_screen'
+            self.restart()
+            self.player.shot_lock = True
+
     def gameplay(self):
         pygame.display.update()
         pygame.mouse.set_visible(False)
@@ -257,6 +263,7 @@ class Game:
         self.check_player_bullets()
         self.check_enemy_bullets()
         self.check_gameplay_events()
+        self.check_player_health()
 
         pygame.display.flip()
         self.clock.tick(60)
