@@ -21,10 +21,10 @@ class LowTurret:
         self.direction = 0
         self.x = x
         self.y = y
-        self.shot_timer = pygame.USEREVENT + 1
-        self.reload_lock = True
+        self.reload_time = 1600
+        self.timer = None
+        self.health = 6
 
     def shot(self, array):
         bullet = EnemyBullet(direction=self.direction, x=self.x + (1 - self.direction) * 50, y=self.y - 1)
         array.append(bullet)
-

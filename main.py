@@ -1,5 +1,4 @@
 import pygame
-import numpy
 from enemies import LowTurret
 from player import Player
 player_sizes = (34, 33)
@@ -17,17 +16,18 @@ class Game:
         pygame.init()
         self.screen = pygame.display.set_mode((1280, 760))
 
+
         self.scene = 'menu'
         self.gravity = 1
+        self.enemy_counter = 0
         self.ground = 680
+        self.lose_screen_mouse_lock = True
         self.menu_mouse_lock = True
         self.pause_mouse_lock = True
         self.place_enemy_lock = True
         self.icon = pygame.image.load('materials/images/simp_moment_right.png').convert_alpha()
         self.bg = pygame.image.load('materials/images/background.png').convert_alpha()
         self.cursor_icon = pygame.image.load('materials/images/cursor.png').convert_alpha()
-        self.ambient = pygame.mixer.Sound('materials/sounds/ambient_st.mp3')
-        self.ambient.set_volume(50)
 
         self.bullets_on_screen = []
         self.enemy_bullets_on_screen = []
@@ -41,6 +41,11 @@ class Game:
         self.running = True
 
         self.player = Player(40, 680)
+
+    def check_quit_in_menus(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
 
     def main_menu(self):
         pygame.display.update()
@@ -74,17 +79,17 @@ class Game:
         elif not mouse[0] and self.menu_mouse_lock:
             self.menu_mouse_lock = False
 
-        pygame.event.get()
+        self.check_quit_in_menus()
 
     def restart(self):
         self.bullets_on_screen = []
         self.enemy_bullets_on_screen = []
         self.enemies_on_screen = []
+        self.enemy_counter = 0
         self.player = Player(40, 680)
 
     def pause(self):
         pygame.display.update()
-        pygame.event.get()
         pygame.mouse.set_visible(True)
 
         self.screen.fill('gray')
@@ -114,11 +119,44 @@ class Game:
         elif not mouse[0] and self.pause_mouse_lock:
             self.pause_mouse_lock = False
 
+        self.check_quit_in_menus()
+
+    def lose_screen(self):
+        pygame.display.update()
+        pygame.mouse.set_visible(True)
+
+        self.screen.fill('gray')
+        you_lose_sign = self.menu_font.render('ВЫ ПРОИГРАЛИ', False, 'white')
+        exit_sign = self.menu_font.render('ВЫЙТИ', False, 'white')
+        sx, sy = self.screen.get_size()
+        lose_x, lose_y = you_lose_sign.get_size()
+        exit_x, exit_y = exit_sign.get_size()
+        lose_pos = (sx / 2 - lose_x / 2, sy / 4 + 20)
+        exit_pos = (sx / 2 - exit_x / 2, sy / 2 - 20)
+        self.screen.blit(you_lose_sign, lose_pos)
+        self.screen.blit(exit_sign, exit_pos)
+
+        mouse = pygame.mouse.get_pressed()
+        exit_box = exit_sign.get_rect(topleft=exit_pos)
+        mouse_box = pygame.Rect(pygame.mouse.get_pos(), (4, 4))
+
+        if mouse[0] and not self.lose_screen_mouse_lock:
+            self.pause_mouse_lock = True
+            if exit_box.colliderect(mouse_box):
+                self.restart()
+                self.scene = 'menu'
+        elif not mouse[0] and self.lose_screen_mouse_lock:
+            self.lose_screen_mouse_lock = False
+
+        self.check_quit_in_menus()
+
     def main_render(self, mouse_pos):
         self.screen.blit(self.bg, (0, 0))
         self.screen.blit(self.cursor_icon, mouse_pos)
         self.screen.blit(self.player.sprites[self.player.direction], (self.player.x, self.player.y))
         self.player.show_ammo(self.screen)
+        if not self.player.ammo:
+            self.player.show_reload(self.screen)
 
     def check_player_bullets(self):
         for bl in self.bullets_on_screen:
@@ -131,9 +169,6 @@ class Game:
     def check_inputs_gameplay(self):
         keys = pygame.key.get_pressed()
         mouse_click = pygame.mouse.get_pressed()
-
-        if not self.player.ammo:
-            self.player.reload(surf=self.screen)
 
         if mouse_click[0]:
             self.player.single_shot(array=self.bullets_on_screen)
@@ -151,50 +186,58 @@ class Game:
             self.place_enemy(0)
 
         if keys[pygame.K_ESCAPE]:
-            self.ambient.stop()
             self.player.shot_lock = True
             self.scene = 'pause'
-
-    def check_enemies(self):
-        for enemy in self.enemies_on_screen:
-            self.screen.blit(enemy.sprites[enemy.direction], (enemy.x, enemy.y))
-            enemy.direction = 0 if enemy.x <= self.player.x else 1
-            enemy.check_reload_and_shot(self.enemy_bullets_on_screen)
-
-    def check_enemy_bullets(self):
-        for enbl in self.enemy_bullets_on_screen:
-            if not -20 <= enbl.x <= 1300 or not -20 <= enbl.y <= 780:
-                self.enemy_bullets_on_screen.remove(enbl)
-                continue
-            self.screen.blit(enbl.sprites[enbl.direction], (enbl.x, enbl.y))
-            enbl.x += (1 - 2 * enbl.direction) * enbl.speed * numpy.cos(enbl.angle * numpy.pi / 180)
-            enbl.y += (1 - 2 * enbl.direction) * enbl.speed * numpy.sin(enbl.angle * numpy.pi / 180)
 
     def place_enemy(self, var):
         mx, my = pygame.mouse.get_pos()
         if var == 0:
-            self.enemies_on_screen.append(LowTurret(x=mx, y=my))
+            enemy = LowTurret(x=mx, y=my)
+            self.enemy_counter += 1
+            enemy.reload_time += len(self.enemies_on_screen)
+            enemy.timer = pygame.USEREVENT + 1 + self.enemy_counter
+            pygame.time.set_timer(enemy.timer, enemy.reload_time)
+            self.enemies_on_screen.append(enemy)
+
+    def check_enemies(self):
+        for enemy in self.enemies_on_screen:
+            self.screen.blit(enemy.sprites[enemy.direction], (enemy.x, enemy.y))
+            enemy.direction = 0 if self.player.x >= enemy.x else 1
+
+    def check_enemy_bullets(self):
+        for bullet in self.enemy_bullets_on_screen:
+            if not (-20 <= bullet.x <= 1300):
+                self.enemy_bullets_on_screen.remove(bullet)
+                continue
+            bullet.x += (1 - 2 * bullet.direction) * bullet.speed
+            self.screen.blit(bullet.sprites[bullet.direction], (bullet.x, bullet.y))
+
+    def check_gameplay_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.running = False
+                break
+            if event.type == self.player.reload_timer:
+                self.player.reload()
+            for enemy in self.enemies_on_screen:
+                if event.type == enemy.timer:
+                    enemy.shot(self.enemy_bullets_on_screen)
+                    break
 
     def gameplay(self):
         pygame.display.update()
         pygame.mouse.set_visible(False)
-        self.ambient.play()
 
         # get positions and triggers
         mx, my = pygame.mouse.get_pos()
+        self.player.direction = 0 if self.player.x <= mx else 1
 
         self.main_render((mx, my))
-        self.player.direction = 0 if self.player.x <= mx else 1
         self.check_player_bullets()
         self.check_inputs_gameplay()
         self.check_enemies()
         self.check_enemy_bullets()
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.running = False
-                pygame.quit()
-                exit()
+        self.check_gameplay_events()
 
         pygame.display.flip()
         self.clock.tick(60)
@@ -210,3 +253,7 @@ if __name__ == '__main__':
                 game.gameplay()
             case 'pause':
                 game.pause()
+            case 'lose_screen':
+                game.lose_screen()
+    pygame.quit()
+    exit()

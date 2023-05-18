@@ -7,6 +7,7 @@ class Player:
         self.speed = 4
         self.direction = 0
         self.ammo = 6
+        self.health = 5
         self.x = x
         self.y = y
         self.is_jump = False
@@ -45,23 +46,21 @@ class Player:
             bullet = Bullet(direction=self.direction, x=self.x + (1 - self.direction) * 33, y=self.y + 13)
             array.append(bullet)
             if not self.ammo:
-                pygame.time.set_timer(self.reload_timer, 1000)
+                pygame.time.set_timer(self.reload_timer, 1000, 1)
 
     def unlock_gun(self):
         self.shot_lock = False
 
-    def reload(self, surf):
-        if not self.ammo:
-            surf.blit(self.reload_icon, (980, 150))
-            for player_event in pygame.event.get():
-                if player_event.type == self.reload_timer:
-                    self.ammo = 6
+    def reload(self):
+        self.ammo = 6
 
     def show_ammo(self, surf):
         w, h = self.bullet_icon.get_size()
         for i in range(self.ammo):
             surf.blit(self.bullet_icon, (self.x + 2 + i * (w + 1), self.y - h - 2))
 
+    def show_reload(self, surf):
+        surf.blit(self.reload_icon, (980, 150))
 
 class Bullet:
     def __init__(self, direction, x, y):
