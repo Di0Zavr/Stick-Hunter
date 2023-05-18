@@ -1,6 +1,6 @@
 import pygame
 import numpy
-from enemies import LowTurret, HighTurret, CircleTurret
+from enemies import LowTurret
 from player import Player
 player_sizes = (34, 33)
 bullet_sizes = (18, 7)
@@ -22,9 +22,12 @@ class Game:
         self.ground = 680
         self.menu_mouse_lock = True
         self.pause_mouse_lock = True
+        self.place_enemy_lock = True
         self.icon = pygame.image.load('materials/images/simp_moment_right.png').convert_alpha()
         self.bg = pygame.image.load('materials/images/background.png').convert_alpha()
         self.cursor_icon = pygame.image.load('materials/images/cursor.png').convert_alpha()
+        self.ambient = pygame.mixer.Sound('materials/sounds/ambient_st.mp3')
+        self.ambient.set_volume(50)
 
         self.bullets_on_screen = []
         self.enemy_bullets_on_screen = []
@@ -73,6 +76,12 @@ class Game:
 
         pygame.event.get()
 
+    def restart(self):
+        self.bullets_on_screen = []
+        self.enemy_bullets_on_screen = []
+        self.enemies_on_screen = []
+        self.player = Player(40, 680)
+
     def pause(self):
         pygame.display.update()
         pygame.event.get()
@@ -90,7 +99,6 @@ class Game:
         self.screen.blit(exit_to_menu, exit_pos)
 
         mouse = pygame.mouse.get_pressed()
-        keys = pygame.key.get_pressed()
         cont_box = continue_sign.get_rect(topleft=cont_pos)
         exit_box = exit_to_menu.get_rect(topleft=exit_pos)
         mouse_box = pygame.Rect(pygame.mouse.get_pos(), (4, 4))
@@ -101,6 +109,7 @@ class Game:
                 self.scene = 'gameplay'
                 self.pause_mouse_lock = True
             elif exit_box.colliderect(mouse_box):
+                self.restart()
                 self.scene = 'menu'
         elif not mouse[0] and self.pause_mouse_lock:
             self.pause_mouse_lock = False
@@ -140,12 +149,9 @@ class Game:
 
         if keys[pygame.K_i]:
             self.place_enemy(0)
-        if keys[pygame.K_o]:
-            self.place_enemy(1)
-        if keys[pygame.K_p]:
-            self.place_enemy(2)
 
         if keys[pygame.K_ESCAPE]:
+            self.ambient.stop()
             self.player.shot_lock = True
             self.scene = 'pause'
 
@@ -168,14 +174,11 @@ class Game:
         mx, my = pygame.mouse.get_pos()
         if var == 0:
             self.enemies_on_screen.append(LowTurret(x=mx, y=my))
-        elif var == 1:
-            self.enemies_on_screen.append(HighTurret(x=mx, y=my))
-        else:
-            self.enemies_on_screen.append(CircleTurret(x=mx, y=my))
 
     def gameplay(self):
         pygame.display.update()
         pygame.mouse.set_visible(False)
+        self.ambient.play()
 
         # get positions and triggers
         mx, my = pygame.mouse.get_pos()
