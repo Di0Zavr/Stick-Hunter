@@ -174,6 +174,8 @@ class Game:
         if keys[pygame.K_SPACE] or self.player.is_jump:
             self.player.jump(self.gravity, self.ground)
 
+        self.player.get_hitbox()
+
         if keys[pygame.K_i]:
             self.place_enemy(0)
 
@@ -193,16 +195,28 @@ class Game:
 
     def check_enemies(self):
         for enemy in self.enemies_on_screen:
+            if enemy.health <= 0:
+                self.enemies_on_screen.remove(enemy)
+                del enemy
+                continue
             self.screen.blit(enemy.sprites[enemy.direction], (enemy.x, enemy.y))
             enemy.direction = 0 if self.player.x >= enemy.x else 1
+            enemy.get_hitbox()
 
     def check_player_bullets(self):
-        for bl in self.bullets_on_screen:
-            if not -20 <= bl.x <= 1300:
-                self.bullets_on_screen.remove(bl)
+        for bullet in self.bullets_on_screen:
+            if not -20 <= bullet.x <= 1300:
+                self.bullets_on_screen.remove(bullet)
                 continue
-            self.screen.blit(bl.sprites[bl.direction], (bl.x, bl.y))
-            bl.x += (1 - 2 * bl.direction) * bl.speed
+            self.screen.blit(bullet.sprites[bullet.direction], (bullet.x, bullet.y))
+            bullet.x += (1 - 2 * bullet.direction) * bullet.speed
+            bullet.get_hitbox()
+            for enemy in self.enemies_on_screen:
+                if enemy.hitbox.colliderect(bullet.hitbox):
+                    enemy.health -= 1
+                    self.bullets_on_screen.remove(bullet)
+                    del bullet
+                    break
 
     def check_enemy_bullets(self):
         for bullet in self.enemy_bullets_on_screen:
@@ -233,9 +247,9 @@ class Game:
         self.player.direction = 0 if self.player.x <= mx else 1
 
         self.main_render((mx, my))
-        self.check_player_bullets()
         self.check_inputs_gameplay()
         self.check_enemies()
+        self.check_player_bullets()
         self.check_enemy_bullets()
         self.check_gameplay_events()
 
