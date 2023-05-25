@@ -1,6 +1,7 @@
 import pygame
 from enemies import LowTurret, HighTurret, CircleTurret
 from player import Player, Goblet
+from editor import GameSolidObject
 player_sizes = (34, 33)
 bullet_sizes = (18, 7)
 turret_sizes = [
@@ -31,6 +32,7 @@ class Game:
         self.enemy_bullets_on_screen = []
         self.enemies_on_screen = []
         self.goblets_on_screen = []
+        self.death_blocks_on_screen = []
 
         self.menu_font = pygame.font.Font('materials/fonts/RussoOne-Regular.ttf', 40)
 
@@ -51,6 +53,7 @@ class Game:
         self.enemy_bullets_on_screen = []
         self.enemies_on_screen = []
         self.goblets_on_screen = []
+        self.death_blocks_on_screen = []
         self.enemy_counter = 0
         self.player = Player(40, 680)
 
@@ -207,7 +210,8 @@ class Game:
             keys[pygame.K_i],
             keys[pygame.K_o],
             keys[pygame.K_p],
-            keys[pygame.K_m]
+            keys[pygame.K_m],
+            keys[pygame.K_f]
         ]
 
         if not self.place_objects_lock:
@@ -219,6 +223,8 @@ class Game:
                 self.place_object('circle', 'enemy')
             elif keys[pygame.K_m]:
                 self.place_object('goblet', 'goblet')
+            elif keys[pygame.K_f]:
+                self.place_object('death_block', 'solid_object')
         elif not any(placing_objects_keys):
             self.place_objects_lock = False
 
@@ -238,6 +244,8 @@ class Game:
                 game_object = CircleTurret(x=mx, y=my)
             case 'goblet':
                 game_object = Goblet(x=mx, y=my)
+            case 'death_block':
+                game_object = GameSolidObject(x=mx, y=my, path='materials/images/ground/death_block.png')
         match obj_type:
             case 'enemy':
                 self.enemy_counter += 1
@@ -246,6 +254,8 @@ class Game:
                 self.enemies_on_screen.append(game_object)
             case 'goblet':
                 self.goblets_on_screen.append(game_object)
+            case 'solid_object':
+                self.death_blocks_on_screen.append(game_object)
         self.place_objects_lock = True
 
     def check_enemies(self):
@@ -303,7 +313,11 @@ class Game:
                 if event.type == self.player.inframes_timer:
                     self.player.invincible = False
 
-    def check_player_health(self):
+    def check_losing(self):
+        for db in self.death_blocks_on_screen:
+            self.screen.blit(db.sprite, (db.x, db.y))
+            if db.hitbox.colliderect(self.player.hitbox):
+                self.player.health = 0
         if self.player.health <= 0:
             self.scene = 'lose_screen'
             self.restart()
@@ -333,7 +347,7 @@ class Game:
         self.check_player_bullets()
         self.check_enemy_bullets()
         self.check_gameplay_events()
-        self.check_player_health()
+        self.check_losing()
         self.check_winning()
 
         pygame.display.flip()
