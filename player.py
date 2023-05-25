@@ -7,11 +7,12 @@ class Player:
         self.speed = 4
         self.direction = 0
         self.ammo = 6
-        self.health = 5
+        self.health = 10
         self.x = x
         self.y = y
         self.is_jump = False
         self.shot_lock = True
+        self.invincible = False
         self.jump_height = 0
         self.sprites = [
             pygame.image.load('materials/images/character/combine/player_combine_right.png').convert_alpha(),
@@ -21,6 +22,7 @@ class Player:
         self.reload_icon = pygame.image.load('materials/images/reload_message.png').convert_alpha()
         self.hitbox = pygame.Rect((self.x, self.y), (16, 33))
         self.reload_timer = pygame.USEREVENT + 1
+        self.inframes_timer = pygame.USEREVENT + 2
 
     def move_right(self, edge):
         self.x = min(self.x + self.speed, edge)
@@ -33,7 +35,7 @@ class Player:
             self.jump_height = 7
             self.is_jump = True
         else:
-            self.y = min(self.y - (self.jump_height**3)//6, ground_level)
+            self.y = min(self.y - self.jump_height, ground_level)
             self.jump_height -= gravity
             if self.y == ground_level:
                 self.is_jump = False
@@ -54,14 +56,15 @@ class Player:
     def reload(self):
         self.ammo = 6
 
+    def take_damage(self):
+        self.health -= 1
+        self.invincible = True
+        pygame.time.set_timer(self.inframes_timer, 1500, 1)
+
     def show_ammo(self, surf):
         w, h = self.bullet_icon.get_size()
         for i in range(self.ammo):
             surf.blit(self.bullet_icon, (self.x + 2 + i * (w + 1), self.y - h - 2))
-
-    def show_reload(self, surf):
-        surf.blit(self.reload_icon, (980, 150))
-
     def get_hitbox(self):
         top_left = (self.x + self.direction * 18, self.y)
         self.hitbox = pygame.Rect(top_left, (16, 33))
@@ -82,3 +85,11 @@ class Bullet:
     def get_hitbox(self):
         top_left = (self.x + (1 - self.direction) * 11, self.y)
         self.hitbox = pygame.Rect(top_left, (7, 7))
+
+class Goblet:
+    def __init__(self, x, y):
+        self.sprite = pygame.image.load('materials/images/ground/goblet.png')
+        self.x = x
+        self.y = y
+        self.dy = 0.01
+        self.hitbox = pygame.Rect((x, y), (22, 20))
