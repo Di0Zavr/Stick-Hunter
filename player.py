@@ -88,7 +88,7 @@ class Bullet:
 
 class Goblet:
     def __init__(self, x, y):
-        self.sprite = pygame.image.load('materials/images/ground/goblet.png')
+        self.sprite = pygame.image.load('materials/images/character/goblet.png')
         self.x = x
         self.y = y
         self.dy = 0.01
