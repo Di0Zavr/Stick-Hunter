@@ -33,6 +33,7 @@ class Game:
         self.enemies_on_screen = []
         self.goblets_on_screen = []
         self.death_blocks_on_screen = []
+        self.solid_blocks = []
 
         self.menu_font = pygame.font.Font('materials/fonts/RussoOne-Regular.ttf', 40)
 
@@ -54,6 +55,7 @@ class Game:
         self.enemies_on_screen = []
         self.goblets_on_screen = []
         self.death_blocks_on_screen = []
+        self.solid_blocks = []
         self.enemy_counter = 0
         self.player = Player(40, 680)
 
@@ -185,7 +187,7 @@ class Game:
     def main_render(self, mouse_pos):
         self.screen.blit(self.bg, (0, 0))
         self.screen.blit(self.cursor_icon, mouse_pos)
-        self.screen.blit(self.player.sprites[self.player.direction], (self.player.x, self.player.y))
+        self.screen.blit(self.player.sprites[self.player.direction], (self.player.x - self.player.direction * 18, self.player.y))
         self.player.show_ammo(self.screen)
 
     def check_inputs_gameplay(self):
@@ -199,19 +201,23 @@ class Game:
 
         if keys[pygame.K_d]:
             self.player.move_right(edge=1247)
+            if self.player.hitbox.collideobjects([b.hitbox for b in self.solid_blocks]):
+                self.player.move_left(edge=1)
         if keys[pygame.K_a]:
             self.player.move_left(edge=1)
-        if keys[pygame.K_SPACE] or self.player.is_jump:
+            if self.player.hitbox.collideobjects([b.hitbox for b in self.solid_blocks]):
+                self.player.move_right(edge=1247)
+        if keys[pygame.K_SPACE] or self.player.in_air:
             self.player.jump(self.gravity, self.ground)
-
-        self.player.get_hitbox()
 
         placing_objects_keys = [
             keys[pygame.K_i],
             keys[pygame.K_o],
             keys[pygame.K_p],
             keys[pygame.K_m],
-            keys[pygame.K_f]
+            keys[pygame.K_f],
+            keys[pygame.K_b],
+            keys[pygame.K_n]
         ]
 
         if not self.place_objects_lock:
@@ -224,7 +230,11 @@ class Game:
             elif keys[pygame.K_m]:
                 self.place_object('goblet', 'goblet')
             elif keys[pygame.K_f]:
-                self.place_object('death_block', 'solid_object')
+                self.place_object('death_block', 'death_block')
+            elif keys[pygame.K_b]:
+                self.place_object('big_block', 'solid_block')
+            elif keys[pygame.K_n]:
+                self.place_object('small_block', 'solid_block')
         elif not any(placing_objects_keys):
             self.place_objects_lock = False
 
@@ -246,6 +256,10 @@ class Game:
                 game_object = Goblet(x=mx, y=my)
             case 'death_block':
                 game_object = GameSolidObject(x=mx, y=my, path='materials/images/ground/death_block.png')
+            case 'big_block':
+                game_object = GameSolidObject(x=mx, y=my, path='materials/images/ground/big_block.png')
+            case 'small_block':
+                game_object = GameSolidObject(x=mx, y=my, path='materials/images/ground/small_block.png')
         match obj_type:
             case 'enemy':
                 self.enemy_counter += 1
@@ -254,8 +268,10 @@ class Game:
                 self.enemies_on_screen.append(game_object)
             case 'goblet':
                 self.goblets_on_screen.append(game_object)
-            case 'solid_object':
+            case 'death_block':
                 self.death_blocks_on_screen.append(game_object)
+            case 'solid_block':
+                self.solid_blocks.append(game_object)
         self.place_objects_lock = True
 
     def check_enemies(self):
@@ -333,6 +349,10 @@ class Game:
                 self.player.shot_lock = True
                 self.place_objects_lock = True
 
+    def check_solid_blocks(self):
+        for block in self.solid_blocks:
+            self.screen.blit(block.sprite, (block.x, block.y))
+
     def gameplay(self):
         pygame.display.update()
         pygame.mouse.set_visible(False)
@@ -349,6 +369,7 @@ class Game:
         self.check_gameplay_events()
         self.check_losing()
         self.check_winning()
+        self.check_solid_blocks()
 
         pygame.display.flip()
         self.clock.tick(60)
