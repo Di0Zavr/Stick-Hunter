@@ -10,7 +10,7 @@ class Player:
         self.health = 10
         self.x = x
         self.y = y
-        self.in_air = False
+        self.in_air = True
         self.shot_lock = True
         self.invincible = False
         self.jump_height = 0
@@ -19,29 +19,17 @@ class Player:
             pygame.image.load('materials/images/character/combine/player_combine_left.png').convert_alpha()
         ]
         self.bullet_icon = pygame.image.load('materials/images/character/bullet/bullet_icon.png').convert_alpha()
-        self.hitbox = pygame.Rect((self.x, self.y), (16, 33))
+        self.get_hitboxes()
         self.reload_timer = pygame.USEREVENT + 1
         self.inframes_timer = pygame.USEREVENT + 2
 
     def move_right(self, edge):
         self.x = min(self.x + self.speed, edge)
-        self.hitbox = pygame.Rect((self.x, self.y), (16, 33))
+        self.get_hitboxes()
 
     def move_left(self, edge):
         self.x = max(self.x - self.speed, edge)
-        self.hitbox = pygame.Rect((self.x, self.y), (16, 33))
-
-    def jump(self, gravity, ground_level):  # заметить граунд-левел на пересечение колайдеров
-        if not self.in_air:
-            self.jump_height = 7
-            self.in_air = True
-        else:
-            self.y = min(self.y - self.jump_height, ground_level)
-            self.jump_height -= gravity
-            if self.y == ground_level:
-                self.in_air = False
-                self.jump_height = 0
-        self.hitbox = pygame.Rect((self.x, self.y), (16, 33))
+        self.get_hitboxes()
 
     def single_shot(self, array):
         if not self.shot_lock and self.ammo:
@@ -67,6 +55,11 @@ class Player:
         w, h = self.bullet_icon.get_size()
         for i in range(self.ammo):
             surf.blit(self.bullet_icon, (self.x - self.direction * 15 + 2 + i * (w + 1), self.y - h - 2))
+
+    def get_hitboxes(self):
+        self.hitbox = pygame.Rect((self.x, self.y), (16, 33))
+        self.head_hitbox = pygame.Rect((self.x, self.y), (16, 1))
+        self.leg_hitbox = pygame.Rect((self.x - 4, self.y + 33), (24, 1))
 
 
 class Bullet:

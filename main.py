@@ -18,7 +18,7 @@ class Game:
         self.screen = pygame.display.set_mode((1280, 760))
 
         self.scene = 'menu'
-        self.gravity = 0.26
+        self.gravity = 0.2
         self.enemy_counter = 0
         self.ground = 680
         self.menu_screen_mouse_lock = True
@@ -42,7 +42,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
 
-        self.player = Player(40, 680)
+        self.player = Player(40, 100)
 
     def check_quit_in_menus(self):
         for event in pygame.event.get():
@@ -57,7 +57,9 @@ class Game:
         self.death_blocks_on_screen = []
         self.solid_blocks = []
         self.enemy_counter = 0
-        self.player = Player(40, 680)
+        self.player = Player(40, 100)
+        bl = GameSolidObject(x=40, y=650, path='materials/images/ground/big_block.png')
+        game.solid_blocks.append(bl)
 
     def main_menu(self):
         pygame.display.update()
@@ -188,6 +190,8 @@ class Game:
         self.screen.blit(self.bg, (0, 0))
         self.screen.blit(self.cursor_icon, mouse_pos)
         self.screen.blit(self.player.sprites[self.player.direction], (self.player.x - self.player.direction * 18, self.player.y))
+        for bl in self.solid_blocks:
+            self.screen.blit(bl.sprite, (bl.x, bl.y))
         self.player.show_ammo(self.screen)
 
     def check_inputs_gameplay(self):
@@ -207,8 +211,32 @@ class Game:
             self.player.move_left(edge=1)
             if self.player.hitbox.collideobjects([b.hitbox for b in self.solid_blocks]):
                 self.player.move_right(edge=1247)
+
+        if not self.player.in_air:
+            self.player.y += self.gravity
+            self.player.get_hitboxes()
+            if not self.player.leg_hitbox.collideobjects([b.hitbox for b in self.solid_blocks]):
+                self.player.in_air = True
+            self.player.y -= self.gravity
+            self.player.get_hitboxes()
+
         if keys[pygame.K_SPACE] or self.player.in_air:
-            self.player.jump(self.gravity, self.ground)
+            if not self.player.in_air:
+                self.player.jump_height = 7.19
+                self.player.in_air = True
+            self.player.jump_height -= self.gravity
+            self.player.y -= self.player.jump_height
+            self.player.get_hitboxes()
+            while self.player.head_hitbox.collideobjects([b.hitbox for b in self.solid_blocks]):
+                self.player.y += self.gravity
+                self.player.get_hitboxes()
+                self.player.jump_height = 0
+                self.player.in_air = True
+            while self.player.leg_hitbox.collideobjects([b.hitbox for b in self.solid_blocks]):
+                self.player.y -= self.gravity
+                self.player.get_hitboxes()
+                self.player.jump_height = 0
+                self.player.in_air = False
 
         placing_objects_keys = [
             keys[pygame.K_i],
@@ -349,10 +377,6 @@ class Game:
                 self.player.shot_lock = True
                 self.place_objects_lock = True
 
-    def check_solid_blocks(self):
-        for block in self.solid_blocks:
-            self.screen.blit(block.sprite, (block.x, block.y))
-
     def gameplay(self):
         pygame.display.update()
         pygame.mouse.set_visible(False)
@@ -369,7 +393,6 @@ class Game:
         self.check_gameplay_events()
         self.check_losing()
         self.check_winning()
-        self.check_solid_blocks()
 
         pygame.display.flip()
         self.clock.tick(60)
@@ -377,6 +400,8 @@ class Game:
 
 if __name__ == '__main__':
     game = Game()
+    block = GameSolidObject(x=40, y=650, path='materials/images/ground/big_block.png')
+    game.solid_blocks.append(block)
     while game.running:
         match game.scene:
             case 'menu':
