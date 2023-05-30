@@ -10,9 +10,16 @@ class GameSolidObject:
 
 
 class Level:
-    def __init__(self, name):
+    def __init__(self, name, x, y):
         self.name = name
-        self.game_objects_on_screen = []
+        self.player_x = x
+        self.player_y = y
+        self.enemies = []
+        self.death_blocks = []
+        self.solid_blocks = []
+        self.player_bullets = []
+        self.enemy_bullets = []
+        self.goblets = []
 
 
 class Editor:
