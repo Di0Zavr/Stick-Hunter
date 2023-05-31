@@ -2,7 +2,7 @@ import pygame
 import os
 from enemies import LowTurret, HighTurret, CircleTurret, EnemyBullet
 from player import Player, Goblet, Bullet
-from editor import GameSolidObject
+from editor import GameSolidObject, Level, Editor
 player_sizes = (34, 33)
 bullet_sizes = (18, 7)
 turret_sizes = [
@@ -44,6 +44,16 @@ class Game:
         self.running = True
 
         self.player = Player(40, 100)
+
+    def save_level(self, name):
+        current = Level(name=name, x=self.player.x, y=self.player.y)
+        current.enemies = self.enemies_on_screen
+        current.death_blocks = self.death_blocks_on_screen
+        current.solid_blocks = self.solid_blocks
+        current.player_bullets = self.bullets_on_screen
+        current.enemy_bullets = self.enemy_bullets_on_screen
+        current.goblets = self.goblets_on_screen
+        current.save()
 
     def load_level(self, name):
         self.restart()
