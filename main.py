@@ -46,7 +46,7 @@ class Game:
         self.player = Player(40, 100)
 
     def save_level(self, name):
-        current = Level(name=name, x=self.player.x, y=self.player.y)
+        current = Level(name=name, x=self.player.x, y=self.player.y, ammo=self.player.ammo, hp=self.player.health)
         current.enemies = self.enemies_on_screen
         current.death_blocks = self.death_blocks_on_screen
         current.solid_blocks = self.solid_blocks
@@ -62,10 +62,10 @@ class Game:
             for obj in game_objects:
                 obj = obj.replace('\n', '')
                 obj = obj.split('-')
-                code, x, y = obj[0], int(obj[1]), int(obj[2])
+                code, x, y = obj[0], float(obj[1]), float(obj[2])
                 match code:
                     case '00':
-                        self.player = Player(x=x, y=y)
+                        self.player = Player(x=x, y=y, ammo=int(obj[3]), hp=int(obj[4]))
                     case '01':
                         t = obj[3]
                         match t:
@@ -147,20 +147,29 @@ class Game:
     def pause(self):
         pygame.display.update()
         pygame.mouse.set_visible(True)
-
         self.screen.fill('gray')
         continue_sign = self.menu_font.render('ПРОДОЛЖИТЬ', False, 'white')
+        save_sign = self.menu_font.render('СОХРАНИТЬ', False, 'white')
+        load_sign = self.menu_font.render('ЗАГРУЗИТЬ СОХРАНЕНИЕ', False, 'white')
         exit_to_menu = self.menu_font.render('ВЫЙТИ В МЕНЮ', False, 'white')
         sx, sy = self.screen.get_size()
         cont_x, cont_y = continue_sign.get_size()
+        save_x, save_y = save_sign.get_size()
+        load_x, load_y = load_sign.get_size()
         exit_x, exit_y = exit_to_menu.get_size()
         cont_pos = (sx / 2 - cont_x / 2, sy / 4)
-        exit_pos = (sx / 2 - exit_x / 2, sy / 4 + cont_y + 30)
+        save_pos = (sx / 2 - save_x / 2, sy / 4 + cont_y + 30)
+        load_pos = (sx / 2 - load_x / 2, sy / 4 + cont_y + save_y + 60)
+        exit_pos = (sx / 2 - exit_x / 2, sy / 4 + cont_y + save_y + load_y + 90)
         self.screen.blit(continue_sign, cont_pos)
+        self.screen.blit(save_sign, save_pos)
+        self.screen.blit(load_sign, load_pos)
         self.screen.blit(exit_to_menu, exit_pos)
 
         mouse = pygame.mouse.get_pressed()
         cont_box = continue_sign.get_rect(topleft=cont_pos)
+        save_box = save_sign.get_rect(topleft=save_pos)
+        load_box = load_sign.get_rect(topleft=load_pos)
         exit_box = exit_to_menu.get_rect(topleft=exit_pos)
         mouse_box = pygame.Rect(pygame.mouse.get_pos(), (4, 4))
 
@@ -172,6 +181,10 @@ class Game:
             elif exit_box.colliderect(mouse_box):
                 self.restart()
                 self.scene = 'menu'
+            elif save_box.colliderect(mouse_box):
+                self.save_level(name='test')
+            elif load_box.colliderect(mouse_box):
+                self.load_level(name='test')
         elif not mouse[0] and self.menu_screen_mouse_lock:
             self.menu_screen_mouse_lock = False
 

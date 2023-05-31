@@ -2,12 +2,11 @@ import pygame
 
 
 class Player:
-    def __init__(self, x, y):
-        self.anim_count = 0
+    def __init__(self, x, y, ammo=6, hp=10):
         self.speed = 4
         self.direction = 0
-        self.ammo = 6
-        self.health = 10
+        self.ammo = ammo
+        self.health = hp
         self.x = x
         self.y = y
         self.in_air = True

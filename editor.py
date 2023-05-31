@@ -11,10 +11,12 @@ class GameSolidObject:
 
 
 class Level:
-    def __init__(self, name, x, y):
+    def __init__(self, name, x, y, ammo, hp):
         self.name = name
         self.player_x = x
         self.player_y = y
+        self.ammo = ammo
+        self.hp = hp
         self.enemies = []
         self.death_blocks = []
         self.solid_blocks = []
@@ -37,8 +39,8 @@ class Level:
         return hash
 
     def save(self):
-        with open(f'saves/{self.name}.txt') as f:
-            f.write(f'00-{self.player_x}-{self.player_y}\n')
+        with open(f'saves/{self.name}.txt', 'w') as f:
+            f.write(f'00-{self.player_x}-{self.player_y}-{self.ammo}-{self.hp}\n')
             for obj in self.enemies:
                 h = self.convert_object(obj, 1)
                 f.write(f'{h}\n')
