@@ -17,17 +17,18 @@ class EnemyBullet:
         self.hitbox = pygame.Rect(top_left, (8, 8))
 
 class LowTurret:
-    def __init__(self, x, y):
+    def __init__(self, x, y, hp):
         self.sprites = [
             pygame.image.load('materials/images/enemies/turrets/low_turret_right.png').convert_alpha(),
             pygame.image.load('materials/images/enemies/turrets/low_turret_left.png').convert_alpha()
         ]
         self.direction = 0
+        self.type = 0
         self.x = x
         self.y = y
         self.reload_time = 1600
         self.timer = None
-        self.health = 6
+        self.health = hp
         self.hitbox = pygame.Rect((self.x, self.y), (50, 24))
 
     def shot(self, array):
@@ -38,17 +39,18 @@ class LowTurret:
         self.hitbox = pygame.Rect((self.x, self.y), (50, 24))
 
 class HighTurret:
-    def __init__(self, x, y):
+    def __init__(self, x, y, hp):
         self.sprites = [
             pygame.image.load('materials/images/enemies/turrets/high_turret_right.png').convert_alpha(),
             pygame.image.load('materials/images/enemies/turrets/high_turret_left.png').convert_alpha()
         ]
         self.direction = 0
+        self.type = 1
         self.x = x
         self.y = y
         self.reload_time = 1600
         self.timer = None
-        self.health = 6
+        self.health = hp
         self.hitbox = pygame.Rect((self.x, self.y), (50, 33))
 
     def shot(self, array):
@@ -59,17 +61,18 @@ class HighTurret:
         self.hitbox = pygame.Rect((self.x, self.y), (50, 33))
 
 class CircleTurret:
-    def __init__(self, x, y):
+    def __init__(self, x, y, hp):
         self.sprites = [
             pygame.image.load('materials/images/enemies/turrets/circle_turret.png').convert_alpha(),
             pygame.image.load('materials/images/enemies/turrets/circle_turret.png').convert_alpha()
         ]
         self.direction = 0
+        self.type = 2
         self.x = x
         self.y = y
         self.reload_time = 1600
         self.timer = None
-        self.health = 6
+        self.health = hp
         self.hitbox = pygame.Rect((self.x, self.y), (40, 17))
 
     def shot(self, array):

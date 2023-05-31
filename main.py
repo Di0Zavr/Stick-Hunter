@@ -1,6 +1,7 @@
 import pygame
-from enemies import LowTurret, HighTurret, CircleTurret
-from player import Player, Goblet
+import os
+from enemies import LowTurret, HighTurret, CircleTurret, EnemyBullet
+from player import Player, Goblet, Bullet
 from editor import GameSolidObject
 player_sizes = (34, 33)
 bullet_sizes = (18, 7)
@@ -44,6 +45,44 @@ class Game:
 
         self.player = Player(40, 100)
 
+    def load_level(self, name):
+        self.restart()
+        with open(f'saves/{name}.txt') as f:
+            game_objects = f.readlines()
+            for obj in game_objects:
+                obj = obj.replace('\n', '')
+                obj = obj.split('-')
+                code, x, y = obj[0], int(obj[1]), int(obj[2])
+                match code:
+                    case '00':
+                        self.player = Player(x=x, y=y)
+                    case '01':
+                        t = obj[3]
+                        match t:
+                            case '0':
+                                self.place_object(var='low', obj_type='enemy', pos=(x, y), en_hp=int(obj[4]))
+                            case '1':
+                                self.place_object(var='high', obj_type='enemy', pos=(x, y), en_hp=int(obj[4]))
+                            case '2':
+                                self.place_object(var='circle', obj_type='enemy', pos=(x, y), en_hp=int(obj[4]))
+                    case '02':
+                        t = obj[3]
+                        match t:
+                            case '0':
+                                self.place_object(var='death_block', obj_type='death_block', pos=(x, y))
+                            case '1':
+                                self.place_object(var='big_block', obj_type='solid_block', pos=(x, y))
+                            case '2':
+                                self.place_object(var='small_block', obj_type='solid_block', pos=(x, y))
+                    case '03':
+                        direction = int(obj[3])
+                        self.place_object(var='player_bullet', obj_type='player_bullet', pos=(x, y), direction=direction)
+                    case '04':
+                        direction = int(obj[3])
+                        self.place_object(var='enemy_bullet', obj_type='enemy_bullet', pos=(x, y), direction=direction)
+                    case '05':
+                        self.place_object(var='goblet', obj_type='goblet', pos=(x, y))
+
     def check_quit_in_menus(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -58,7 +97,7 @@ class Game:
         self.solid_blocks = []
         self.enemy_counter = 0
         self.player = Player(40, 100)
-        bl = GameSolidObject(x=40, y=650, path='materials/images/ground/big_block.png')
+        bl = GameSolidObject(x=40, y=650, path='materials/images/ground/big_block.png', t=1)
         game.solid_blocks.append(bl)
 
     def main_menu(self):
@@ -271,23 +310,30 @@ class Game:
             self.place_objects_lock = True
             self.scene = 'pause'
 
-    def place_object(self, var, obj_type):
-        mx, my = pygame.mouse.get_pos()
+    def place_object(self, var, obj_type, pos=None, en_hp=6, direction=None):
+        if not pos:
+            x, y = pygame.mouse.get_pos()
+        else:
+            x, y = pos
         match var:
             case 'low':
-                game_object = LowTurret(x=mx, y=my)
+                game_object = LowTurret(x=x, y=y, hp=en_hp)
             case 'high':
-                game_object = HighTurret(x=mx, y=my)
+                game_object = HighTurret(x=x, y=y, hp=en_hp)
             case 'circle':
-                game_object = CircleTurret(x=mx, y=my)
+                game_object = CircleTurret(x=x, y=y, hp=en_hp)
             case 'goblet':
-                game_object = Goblet(x=mx, y=my)
+                game_object = Goblet(x=x, y=y)
             case 'death_block':
-                game_object = GameSolidObject(x=mx, y=my, path='materials/images/ground/death_block.png')
+                game_object = GameSolidObject(x=x, y=y, path='materials/images/ground/death_block.png', t=0)
             case 'big_block':
-                game_object = GameSolidObject(x=mx, y=my, path='materials/images/ground/big_block.png')
+                game_object = GameSolidObject(x=x, y=y, path='materials/images/ground/big_block.png', t=1)
             case 'small_block':
-                game_object = GameSolidObject(x=mx, y=my, path='materials/images/ground/small_block.png')
+                game_object = GameSolidObject(x=x, y=y, path='materials/images/ground/small_block.png', t=2)
+            case 'player_bullet':
+                game_object = Bullet(direction=direction, x=x, y=y)
+            case 'enemy_bullet':
+                game_object = EnemyBullet(direction=direction, x=x, y=y)
         match obj_type:
             case 'enemy':
                 self.enemy_counter += 1
@@ -300,6 +346,10 @@ class Game:
                 self.death_blocks_on_screen.append(game_object)
             case 'solid_block':
                 self.solid_blocks.append(game_object)
+            case 'e_bullet':
+                self.enemy_bullets_on_screen.append(game_object)
+            case 'p_bullet':
+                self.bullets_on_screen.append(game_object)
         self.place_objects_lock = True
 
     def check_enemies(self):
@@ -400,7 +450,7 @@ class Game:
 
 if __name__ == '__main__':
     game = Game()
-    block = GameSolidObject(x=40, y=650, path='materials/images/ground/big_block.png')
+    block = GameSolidObject(x=40, y=650, path='materials/images/ground/big_block.png', t=1)
     game.solid_blocks.append(block)
     while game.running:
         match game.scene:
