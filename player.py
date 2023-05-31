@@ -56,9 +56,9 @@ class Player:
             surf.blit(self.bullet_icon, (self.x - self.direction * 15 + 2 + i * (w + 1), self.y - h - 2))
 
     def get_hitboxes(self):
-        self.hitbox = pygame.Rect((self.x, self.y), (16, 33))
+        self.hitbox = pygame.Rect((self.x, self.y), (16, 32))
         self.head_hitbox = pygame.Rect((self.x, self.y), (16, 1))
-        self.leg_hitbox = pygame.Rect((self.x - 2, self.y + 33), (20, 1))
+        self.leg_hitbox = pygame.Rect((self.x - 2, self.y + 32), (20, 1))
 
 
 class Bullet:
