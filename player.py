@@ -59,7 +59,7 @@ class Player:
     def get_hitboxes(self):
         self.hitbox = pygame.Rect((self.x, self.y), (16, 33))
         self.head_hitbox = pygame.Rect((self.x, self.y), (16, 1))
-        self.leg_hitbox = pygame.Rect((self.x - 4, self.y + 33), (24, 1))
+        self.leg_hitbox = pygame.Rect((self.x - 2, self.y + 33), (20, 1))
 
 
 class Bullet:
