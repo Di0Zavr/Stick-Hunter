@@ -3,14 +3,6 @@ import os
 from enemies import LowTurret, HighTurret, CircleTurret, EnemyBullet
 from player import Player, Goblet, Bullet
 from editor import GameSolidObject, Level, Editor
-player_sizes = (34, 33)
-bullet_sizes = (18, 7)
-turret_sizes = [
-    (50, 24),
-    (50, 33),
-    (40, 17)
-]
-enemy_bullet_sizes = (15, 8)
 
 
 class Game:
@@ -45,7 +37,8 @@ class Game:
 
         self.player = Player(40, 100)
 
-    def save_level(self, name):
+    def save_level(self):
+        name = input('Введите название сохранения')
         current = Level(name=name, x=self.player.x, y=self.player.y, ammo=self.player.ammo, hp=self.player.health)
         current.enemies = self.enemies_on_screen
         current.death_blocks = self.death_blocks_on_screen
@@ -182,7 +175,7 @@ class Game:
                 self.restart()
                 self.scene = 'menu'
             elif save_box.colliderect(mouse_box):
-                self.save_level(name='test')
+                self.save_level()
             elif load_box.colliderect(mouse_box):
                 self.load_level(name='test')
         elif not mouse[0] and self.menu_screen_mouse_lock:
@@ -391,6 +384,11 @@ class Game:
         for bullet in self.bullets_on_screen:
             if not -20 <= bullet.x <= 1300:
                 self.bullets_on_screen.remove(bullet)
+                del bullet
+                continue
+            if bullet.hitbox.collideobjects([b.hitbox for b in self.solid_blocks]):
+                self.bullets_on_screen.remove(bullet)
+                del bullet
                 continue
             self.screen.blit(bullet.sprites[bullet.direction], (bullet.x, bullet.y))
             bullet.x += (1 - 2 * bullet.direction) * bullet.speed
@@ -406,6 +404,10 @@ class Game:
         for bullet in self.enemy_bullets_on_screen:
             if not (-20 <= bullet.x <= 1300):
                 self.enemy_bullets_on_screen.remove(bullet)
+                continue
+            if bullet.hitbox.collideobjects([b.hitbox for b in self.solid_blocks]):
+                self.enemy_bullets_on_screen.remove(bullet)
+                del bullet
                 continue
             self.screen.blit(bullet.sprites[bullet.direction], (bullet.x, bullet.y))
             bullet.x += (1 - 2 * bullet.direction) * bullet.speed
@@ -435,6 +437,8 @@ class Game:
             self.screen.blit(db.sprite, (db.x, db.y))
             if db.hitbox.colliderect(self.player.hitbox):
                 self.player.health = 0
+        if self.player.y > 850:
+            self.player.health = 0
         if self.player.health <= 0:
             self.scene = 'lose_screen'
             self.restart()
