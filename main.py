@@ -177,7 +177,44 @@ class Game:
             elif save_box.colliderect(mouse_box):
                 self.save_level()
             elif load_box.colliderect(mouse_box):
-                self.load_level(name='test')
+                self.scene = 'loading_screen'
+        elif not mouse[0] and self.menu_screen_mouse_lock:
+            self.menu_screen_mouse_lock = False
+
+        self.check_quit_in_menus()
+
+    def loading_screen(self):
+        pygame.display.update()
+        pygame.mouse.set_visible(True)
+        mouse = pygame.mouse.get_pressed()
+        mouse_box = pygame.Rect(pygame.mouse.get_pos(), (4, 4))
+        self.screen.fill('gray')
+
+        exit_sign = self.menu_font.render('ВЕРНУТЬСЯ НАЗАД', False, 'white')
+        sx, sy = self.screen.get_size()
+        ex, ey = exit_sign.get_size()
+        self.screen.blit(exit_sign, (sx / 2 - ex / 2, 50))
+        exit_box = pygame.Rect((sx / 2 - ex / 2, 50), (ex, ey))
+
+        filenames = os.listdir('saves')
+        correct_files = [file for file in filenames if file.endswith('.txt')]
+        cur_x, cur_y = 100, 100
+        hitboxes = []
+        for savefile in correct_files:
+            savefile = savefile.replace('.txt', '')
+            name_sign = self.menu_font.render(savefile, False, 'white')
+            self.screen.blit(name_sign, (cur_x, cur_y))
+            hitboxes.append((pygame.Rect((cur_x, cur_y), name_sign.get_size()), savefile))
+            cur_y += 50
+
+        if mouse[0] and not self.menu_screen_mouse_lock:
+            self.menu_screen_mouse_lock = True
+            if exit_box.colliderect(mouse_box):
+                self.scene = 'pause'
+            for (hitbox, name) in hitboxes:
+                if hitbox.colliderect(mouse_box):
+                    self.load_level(name=name)
+                    self.scene = 'pause'
         elif not mouse[0] and self.menu_screen_mouse_lock:
             self.menu_screen_mouse_lock = False
 
@@ -491,5 +528,7 @@ if __name__ == '__main__':
                 game.lose_screen()
             case 'win_screen':
                 game.win_screen()
+            case 'loading_screen':
+                game.loading_screen()
     pygame.quit()
     exit()
