@@ -39,8 +39,8 @@ class Game:
             pygame.image.load('materials/images/enemies/turrets/low_turret_left.png').convert_alpha(),
             pygame.image.load('materials/images/enemies/turrets/high_turret_left.png').convert_alpha(),
             pygame.image.load('materials/images/enemies/turrets/circle_turret.png').convert_alpha(),
-            pygame.image.load('materials/images/character/combine/player_in_editor.png').convert_alpha(),
             pygame.image.load('materials/images/character/goblet.png').convert_alpha(),
+            pygame.image.load('materials/images/character/combine/player_in_editor.png').convert_alpha(),
         ]
         self.editor_selection_boxes = []
         for i in range(len(self.editor_sprites)):
@@ -372,11 +372,6 @@ class Game:
         self.editor_playground_render(surf=playground)
         self.editor_selection_panel_render(surf=selection_panel)
 
-        if keys[pygame.K_ESCAPE]:
-            self.editor_placement_lock = True
-            self.last_scene = 'editor'
-            self.scene = 'pause'
-
         if (mouse[0] or mouse[1]) and not self.editor_placement_lock:
             self.editor_placement_lock = True
             if 0 <= mx <= 1280:
@@ -385,6 +380,11 @@ class Game:
                 self.editor_check_selection_panel_inputs()
         elif not mouse[0] and not mouse[1] and self.editor_placement_lock:
             self.editor_placement_lock = False
+
+        if keys[pygame.K_ESCAPE]:
+            self.editor_placement_lock = True
+            self.last_scene = 'editor'
+            self.scene = 'pause'
 
         self.check_quit_in_menus()
 
@@ -625,8 +625,6 @@ class Game:
 
 if __name__ == '__main__':
     game = Game()
-    block = GameSolidObject(x=40, y=650, path='materials/images/ground/big_block.png', t=1)
-    game.solid_blocks.append(block)
     while game.running:
         match game.scene:
             case 'menu':
