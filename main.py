@@ -296,6 +296,30 @@ class Game:
 
         self.check_quit_in_menus()
 
+    def init_editor(self):
+        self.screen = pygame.display.set_mode((1400, 720))
+        pygame.display.set_icon(self.gear_icon)
+        pygame.display.set_caption('Editor')
+
+    def editor_playground_render(self, surf):
+        w, h = surf.get_size()
+        surf.blit(self.bg, (0, 0))
+        for i in range(0, w + 1, 16):
+            pygame.draw.line(surf, 'gray', (i, 0), (i, h))
+        for i in range(0, h + 1, 16):
+            pygame.draw.line(surf, 'gray', (0, i), (w, i))
+        for bl in self.solid_blocks:
+            surf.blit(bl.sprite, (bl.x, bl.y))
+        for db in self.death_blocks_on_screen:
+            surf.blit(db.sprite, (db.x, db.y))
+        for en in self.enemies_on_screen:
+            surf.blit(en.sprites[1], (en.x, en.y))
+        for g in self.goblets_on_screen:
+            surf.blit(g.sprite, (g.x, g.y))
+        player = pygame.image.load('materials/images/character/combine/player_in_editor.png').convert_alpha()
+        surf.blit(player, self.editor_player_pos)
+        self.screen.blit(surf, (0, 0))
+
     def main_render(self, mouse_pos):
         self.screen.blit(self.bg, (0, 0))
         self.screen.blit(self.cursor_icon, mouse_pos)
