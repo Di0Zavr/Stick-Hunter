@@ -320,6 +320,8 @@ class Game:
         self.screen = pygame.display.set_mode((1400, 720))
         pygame.display.set_icon(self.gear_icon)
         pygame.display.set_caption('Editor')
+        self.editor_current_obj = -1
+        self.editor_player_pos = (0, 0)
 
     def editor_playground_render(self, surf):
         w, h = surf.get_size()
@@ -344,12 +346,21 @@ class Game:
         surf.fill((40, 62, 197))
         for i in range(len(self.editor_sprites)):
             if i == self.editor_current_obj:
-                pygame.draw.rect(surf, (92, 10, 33), (60 * (i % 2), 60 * (i // 2), (60, 60)))
+                pygame.draw.rect(surf, (92, 10, 33), (60 * (i % 2), 60 * (i // 2), 60, 60))
             sprite = self.editor_sprites[i]
             (w, h) = sprite.get_size()
             surf.blit(sprite, (60 * (i % 2) + 30 - w/2, 60 * (i // 2) + 30 - h/2))
 
         self.screen.blit(surf, (1281, 0))
+
+    def editor_check_selection_panel_inputs(self):
+        (mx, my) = pygame.mouse.get_pos()
+        mouse = pygame.mouse.get_pressed()
+        mouse_box = pygame.Rect((mx, my), (4, 4))
+        if mouse[0]:
+            for (num, box) in self.editor_selection_boxes:
+                if box.colliderect(mouse_box):
+                    self.editor_current_obj = num
 
     def editor(self):
         pygame.display.update()
@@ -373,7 +384,7 @@ class Game:
             if 0 <= mx <= 1280:
                 self.editor_check_playground_inputs(playground)
             elif 1281 <= mx <= 1400:
-                self.editor_check_selection_panel_inputs(selection_panel)
+                self.editor_check_selection_panel_inputs()
         elif not mouse[0] and not mouse[1] and self.editor_placement_lock:
             self.editor_placement_lock = False
 
