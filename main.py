@@ -63,7 +63,11 @@ class Game:
 
     def save_level(self):
         name = input('Введите название сохранения')
-        current = Level(name=name, x=self.player.x, y=self.player.y, ammo=self.player.ammo, hp=self.player.health)
+        if self.last_scene == 'editor':
+            (x, y) = self.editor_player_pos
+        else:
+            (x, y) = (self.player.x, self.player.y)
+        current = Level(name=name, x=x, y=y, ammo=self.player.ammo, hp=self.player.health)
         current.enemies = self.enemies_on_screen
         current.death_blocks = self.death_blocks_on_screen
         current.solid_blocks = self.solid_blocks
