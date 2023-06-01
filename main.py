@@ -8,6 +8,7 @@ from level import GameSolidObject, Level
 class Game:
     def __init__(self):
         pygame.init()
+        self.gameplay_screen_init()
 
         self.last_scene = ''
         self.scene = 'menu'
@@ -17,7 +18,6 @@ class Game:
         self.menu_screen_mouse_lock = True
         self.place_objects_lock = True
 
-        self.icon = pygame.image.load('materials/images/simp_moment_right.png').convert_alpha()
         self.bg = pygame.image.load('materials/images/background.png').convert_alpha()
         self.cursor_icon = pygame.image.load('materials/images/cursor.png').convert_alpha()
         self.gear_icon = pygame.image.load('materials/images/editor_icon.png').convert_alpha()
@@ -58,6 +58,7 @@ class Game:
     def gameplay_screen_init(self):
         self.screen = pygame.display.set_mode((1280, 720))
         pygame.display.set_caption('Crystal Hunter')
+        self.icon = pygame.image.load('materials/images/simp_moment_right.png').convert_alpha()
         pygame.display.set_icon(self.icon)
 
     def save_level(self):
@@ -209,6 +210,8 @@ class Game:
             elif exit_box.colliderect(mouse_box):
                 self.restart()
                 self.scene = 'menu'
+                if self.last_scene == 'editor':
+                    self.gameplay_screen_init()
             elif save_box.colliderect(mouse_box):
                 self.save_level()
             elif load_box.colliderect(mouse_box):
