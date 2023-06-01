@@ -8,8 +8,8 @@ from level import GameSolidObject, Level
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1280, 720))
 
+        self.last_scene = ''
         self.scene = 'menu'
         self.gravity = 0.2
         self.enemy_counter = 0
@@ -29,6 +29,7 @@ class Game:
         self.death_blocks_on_screen = []
         self.solid_blocks = []
 
+        self.editor_placement_lock = True
         self.editor_player_pos = (0, 0)
         self.editor_current_obj = -1
         self.editor_sprites = [
@@ -48,12 +49,16 @@ class Game:
 
         self.menu_font = pygame.font.Font('materials/fonts/RussoOne-Regular.ttf', 40)
 
-        pygame.display.set_caption('Crystal Hunter')
-        pygame.display.set_icon(self.icon)
+        self.gameplay_screen_init()
         self.clock = pygame.time.Clock()
         self.running = True
 
         self.player = Player(40, 100)
+
+    def gameplay_screen_init(self):
+        self.screen = pygame.display.set_mode((1280, 720))
+        pygame.display.set_caption('Crystal Hunter')
+        pygame.display.set_icon(self.icon)
 
     def save_level(self):
         name = input('Введите название сохранения')
