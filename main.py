@@ -123,9 +123,7 @@ class Game:
         self.death_blocks_on_screen = []
         self.solid_blocks = []
         self.enemy_counter = 0
-        self.player = Player(40, 100)
-        bl = GameSolidObject(x=40, y=650, path='materials/images/ground/big_block.png', t=1)
-        game.solid_blocks.append(bl)
+        self.player = Player(0, 0)
 
     def main_menu(self):
         pygame.display.update()
