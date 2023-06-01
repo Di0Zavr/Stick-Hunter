@@ -320,6 +320,17 @@ class Game:
         surf.blit(player, self.editor_player_pos)
         self.screen.blit(surf, (0, 0))
 
+    def editor_selection_panel_render(self, surf):
+        surf.fill((40, 62, 197))
+        for i in range(len(self.editor_sprites)):
+            if i == self.editor_current_obj:
+                pygame.draw.rect(surf, (92, 10, 33), (60 * (i % 2), 60 * (i // 2), (60, 60)))
+            sprite = self.editor_sprites[i]
+            (w, h) = sprite.get_size()
+            surf.blit(sprite, (30 - w/2, 30 - h/2))
+
+        self.screen.blit(surf, (1281, 0))
+
     def main_render(self, mouse_pos):
         self.screen.blit(self.bg, (0, 0))
         self.screen.blit(self.cursor_icon, mouse_pos)
