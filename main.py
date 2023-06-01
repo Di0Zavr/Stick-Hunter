@@ -169,6 +169,9 @@ class Game:
 
         self.check_quit_in_menus()
 
+    def level_select(self):
+        pass
+
     def pause(self):
         pygame.display.update()
         pygame.mouse.set_visible(True)
@@ -594,6 +597,8 @@ if __name__ == '__main__':
         match game.scene:
             case 'menu':
                 game.main_menu()
+            case 'level_select':
+                game.level_select()
             case 'gameplay':
                 game.gameplay()
             case 'pause':
