@@ -345,7 +345,7 @@ class Game:
                 pygame.draw.rect(surf, (92, 10, 33), (60 * (i % 2), 60 * (i // 2), (60, 60)))
             sprite = self.editor_sprites[i]
             (w, h) = sprite.get_size()
-            surf.blit(sprite, (30 - w/2, 30 - h/2))
+            surf.blit(sprite, (60 * (i % 2) + 30 - w/2, 60 * (i // 2) + 30 - h/2))
 
         self.screen.blit(surf, (1281, 0))
 
