@@ -204,7 +204,6 @@ class Game:
         if mouse[0] and not self.menu_screen_mouse_lock:
             self.menu_screen_mouse_lock = True
             if cont_box.colliderect(mouse_box):
-                self.scene = 'gameplay'
                 self.scene = self.last_scene
                 self.menu_screen_mouse_lock = True
             elif exit_box.colliderect(mouse_box):
@@ -349,10 +348,33 @@ class Game:
 
         self.screen.blit(surf, (1281, 0))
 
+    def editor(self):
+        pygame.display.update()
+        pygame.mouse.set_visible(True)
+        mouse = pygame.mouse.get_pressed()
+        keys = pygame.key.get_pressed()
+        (mx, my) = pygame.mouse.get_pos()
+
+        selection_panel = pygame.Surface((120, 720))
+        playground = pygame.Surface((1280, 720))
+        self.editor_playground_render(surf=playground)
+        self.editor_selection_panel_render(surf=selection_panel)
+
         if keys[pygame.K_ESCAPE]:
             self.editor_placement_lock = True
             self.last_scene = 'editor'
             self.scene = 'pause'
+
+        if (mouse[0] or mouse[1]) and not self.editor_placement_lock:
+            self.editor_placement_lock = True
+            if 0 <= mx <= 1280:
+                self.editor_check_playground_inputs(playground)
+            elif 1281 <= mx <= 1400:
+                self.editor_check_selection_panel_inputs(selection_panel)
+        elif not mouse[0] and not mouse[1] and self.editor_placement_lock:
+            self.editor_placement_lock = False
+
+        self.check_quit_in_menus()
 
     def main_render(self, mouse_pos):
         self.screen.blit(self.bg, (0, 0))
@@ -609,5 +631,7 @@ if __name__ == '__main__':
                 game.win_screen()
             case 'loading_screen':
                 game.loading_screen()
+            case 'editor':
+                game.editor()
     pygame.quit()
     exit()
