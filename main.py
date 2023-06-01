@@ -133,16 +133,21 @@ class Game:
         self.screen.fill('gray')
         play_sign = self.menu_font.render('ИГРАТЬ', False, 'white')
         exit_from_game_sign = self.menu_font.render('ВЫЙТИ ИЗ ИГРЫ', False, 'white')
+        editor_sign = self.menu_font.render('РЕДАКТОР УРОВНЕЙ', False, 'white')
         sx, sy = self.screen.get_size()
         play_x, play_y = play_sign.get_size()
         exit_x, exit_y = exit_from_game_sign.get_size()
+        editor_x, editor_y = editor_sign.get_size()
         play_pos = (sx/2 - play_x/2, sy/4)
-        exit_pos = (sx/2 - exit_x/2, sy/4 + play_y + 30)
+        edit_pos = (sx/2 - editor_x/2, sy/4 + 80)
+        exit_pos = (sx/2 - exit_x/2, sy/4 + 160)
         self.screen.blit(play_sign, play_pos)
+        self.screen.blit(editor_sign, edit_pos)
         self.screen.blit(exit_from_game_sign, exit_pos)
 
         mouse = pygame.mouse.get_pressed()
         play_box = play_sign.get_rect(topleft=play_pos)
+        edit_box = editor_sign.get_rect(topleft=edit_pos)
         exit_box = exit_from_game_sign.get_rect(topleft=exit_pos)
         mouse_box = pygame.Rect(pygame.mouse.get_pos(), (4, 4))
 
@@ -150,6 +155,10 @@ class Game:
             self.menu_screen_mouse_lock = True
             if play_box.colliderect(mouse_box):
                 self.scene = 'gameplay'
+                self.menu_screen_mouse_lock = True
+            elif edit_box.colliderect(mouse_box):
+                self.scene = 'editor'
+                self.init_editor()
                 self.menu_screen_mouse_lock = True
             elif exit_box.colliderect(mouse_box):
                 self.running = False
@@ -193,6 +202,7 @@ class Game:
             self.menu_screen_mouse_lock = True
             if cont_box.colliderect(mouse_box):
                 self.scene = 'gameplay'
+                self.scene = self.last_scene
                 self.menu_screen_mouse_lock = True
             elif exit_box.colliderect(mouse_box):
                 self.restart()
@@ -336,6 +346,11 @@ class Game:
 
         self.screen.blit(surf, (1281, 0))
 
+        if keys[pygame.K_ESCAPE]:
+            self.editor_placement_lock = True
+            self.last_scene = 'editor'
+            self.scene = 'pause'
+
     def main_render(self, mouse_pos):
         self.screen.blit(self.bg, (0, 0))
         self.screen.blit(self.cursor_icon, mouse_pos)
@@ -419,6 +434,7 @@ class Game:
         if keys[pygame.K_ESCAPE]:
             self.player.shot_lock = True
             self.place_objects_lock = True
+            self.last_scene = 'gameplay'
             self.scene = 'pause'
 
     def place_object(self, var, obj_type, pos=None, en_hp=6, direction=None):
