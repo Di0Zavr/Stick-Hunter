@@ -2,13 +2,13 @@ import pygame
 import os
 from enemies import LowTurret, HighTurret, CircleTurret, EnemyBullet
 from player import Player, Goblet, Bullet
-from editor import GameSolidObject, Level, Editor
+from level import GameSolidObject, Level
 
 
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((1280, 760))
+        self.screen = pygame.display.set_mode((1280, 720))
 
         self.scene = 'menu'
         self.gravity = 0.2
@@ -20,6 +20,7 @@ class Game:
         self.icon = pygame.image.load('materials/images/simp_moment_right.png').convert_alpha()
         self.bg = pygame.image.load('materials/images/background.png').convert_alpha()
         self.cursor_icon = pygame.image.load('materials/images/cursor.png').convert_alpha()
+        self.gear_icon = pygame.image.load('materials/images/editor_icon.png').convert_alpha()
 
         self.bullets_on_screen = []
         self.enemy_bullets_on_screen = []
@@ -27,6 +28,23 @@ class Game:
         self.goblets_on_screen = []
         self.death_blocks_on_screen = []
         self.solid_blocks = []
+
+        self.editor_player_pos = (0, 0)
+        self.editor_current_obj = -1
+        self.editor_sprites = [
+            pygame.image.load('materials/images/ground/big_block.png').convert_alpha(),
+            pygame.image.load('materials/images/ground/small_block.png').convert_alpha(),
+            pygame.image.load('materials/images/ground/death_block.png').convert_alpha(),
+            pygame.image.load('materials/images/enemies/turrets/low_turret_left.png').convert_alpha(),
+            pygame.image.load('materials/images/enemies/turrets/high_turret_left.png').convert_alpha(),
+            pygame.image.load('materials/images/enemies/turrets/circle_turret.png').convert_alpha(),
+            pygame.image.load('materials/images/character/combine/player_in_editor.png').convert_alpha(),
+            pygame.image.load('materials/images/character/goblet.png').convert_alpha(),
+        ]
+        self.editor_selection_boxes = []
+        for i in range(len(self.editor_sprites)):
+            box = pygame.Rect(((1281 + 60 * (i % 2), 60 * (i // 2)), (60, 60)))
+            self.editor_selection_boxes.append((i, box))
 
         self.menu_font = pygame.font.Font('materials/fonts/RussoOne-Regular.ttf', 40)
 
