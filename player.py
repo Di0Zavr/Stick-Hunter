@@ -83,4 +83,4 @@ class Goblet:
         self.x = x
         self.y = y
         self.sprite = pygame.image.load('materials/images/character/goblet.png')
-        self.hitbox = pygame.Rect((x, y), (22, 20))
+        self.hitbox = pygame.Rect((x, y), (16, 16))

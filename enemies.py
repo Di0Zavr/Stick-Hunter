@@ -29,14 +29,14 @@ class LowTurret:
         self.reload_time = 1600
         self.timer = None
         self.health = hp
-        self.hitbox = pygame.Rect((self.x, self.y), (50, 24))
+        self.hitbox = pygame.Rect((self.x, self.y), (48, 16))
 
     def shot(self, array):
         bullet = EnemyBullet(direction=self.direction, x=self.x + (1 - self.direction) * 50, y=self.y + 1)
         array.append(bullet)
 
     def get_hitbox(self):
-        self.hitbox = pygame.Rect((self.x, self.y), (50, 24))
+        self.hitbox = pygame.Rect((self.x, self.y), (48, 16))
 
 class HighTurret:
     def __init__(self, x, y, hp):
@@ -51,14 +51,14 @@ class HighTurret:
         self.reload_time = 1600
         self.timer = None
         self.health = hp
-        self.hitbox = pygame.Rect((self.x, self.y), (50, 33))
+        self.hitbox = pygame.Rect((self.x, self.y), (48, 32))
 
     def shot(self, array):
         bullet = EnemyBullet(direction=self.direction, x=self.x + (1 - self.direction) * 50, y=self.y + 1)
         array.append(bullet)
 
     def get_hitbox(self):
-        self.hitbox = pygame.Rect((self.x, self.y), (50, 33))
+        self.hitbox = pygame.Rect((self.x, self.y), (48, 32))
 
 class CircleTurret:
     def __init__(self, x, y, hp):
@@ -73,7 +73,7 @@ class CircleTurret:
         self.reload_time = 1600
         self.timer = None
         self.health = hp
-        self.hitbox = pygame.Rect((self.x, self.y), (40, 17))
+        self.hitbox = pygame.Rect((self.x, self.y), (32, 16))
 
     def shot(self, array):
         bullet = EnemyBullet(direction=1, x=self.x, y=self.y + 2)
@@ -82,4 +82,4 @@ class CircleTurret:
         array.append(bullet)
 
     def get_hitbox(self):
-        self.hitbox = pygame.Rect((self.x, self.y), (40, 17))
+        self.hitbox = pygame.Rect((self.x, self.y), (32, 16))
