@@ -351,6 +351,30 @@ class Game:
 
         self.screen.blit(surf, (1281, 0))
 
+    def place_object_in_editor(self):
+        (mx, my) = pygame.mouse.get_pos()
+        mx -= mx % 16
+        my -= my % 16
+        objects_dict = {
+            0: ('big_block', 'solid_block'),
+            1: ('small_block', 'solid_block'),
+            2: ('death_block', 'death_block'),
+            3: ('low', 'enemy'),
+            4: ('high', 'enemy'),
+            5: ('circle', 'enemy'),
+            6: ('goblet', 'goblet'),
+        }
+        if self.editor_current_obj == 7:
+            self.editor_player_pos = (mx, my)
+        else:
+            obj_info = objects_dict.get(self.editor_current_obj)
+            self.place_object(var=obj_info[0], obj_type=obj_info[1], pos=(mx, my))
+
+    def editor_check_playground_inputs(self):
+        mouse = pygame.mouse.get_pressed()
+        if mouse[0]:
+            self.place_object_in_editor()
+
     def editor_check_selection_panel_inputs(self):
         (mx, my) = pygame.mouse.get_pos()
         mouse = pygame.mouse.get_pressed()
@@ -375,7 +399,7 @@ class Game:
         if (mouse[0] or mouse[1]) and not self.editor_placement_lock:
             self.editor_placement_lock = True
             if 0 <= mx <= 1280:
-                self.editor_check_playground_inputs(playground)
+                self.editor_check_playground_inputs()
             elif 1281 <= mx <= 1400:
                 self.editor_check_selection_panel_inputs()
         elif not mouse[0] and not mouse[1] and self.editor_placement_lock:
