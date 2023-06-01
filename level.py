@@ -59,7 +59,3 @@ class Level:
             for obj in self.goblets:
                 h = self.convert_object(obj, 5)
                 f.write(f'{h}\n')
-
-class Editor:
-    def __init__(self):
-        pass
