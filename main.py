@@ -176,7 +176,48 @@ class Game:
         self.check_quit_in_menus()
 
     def level_select(self):
-        pass
+        pygame.display.update()
+        pygame.mouse.set_visible(True)
+        mouse = pygame.mouse.get_pressed()
+        (mx, my) = pygame.mouse.get_pos()
+        mouse_box = pygame.Rect((mx, my), (2, 2))
+
+        self.screen.fill('gray')
+        choose = self.menu_font.render('ВЫБЕРИТЕ УРОВЕНЬ', False, 'white')
+        l_1 = self.menu_font.render('УРОВЕНЬ 1', False, 'white')
+        l_2 = self.menu_font.render('УРОВЕНЬ 2', False, 'white')
+        l_3 = self.menu_font.render('УРОВЕНЬ 3', False, 'white')
+        custom = self.menu_font.render('ПОЛЬЗОВАТЕЛЬСКИЕ УРОВНИ', False, 'white')
+        exit = self.menu_font.render('ВЕРНУТЬСЯ НАЗАД', False, 'white')
+        signs = [choose, l_1, l_2, l_3, custom, exit]
+        boxes = []
+        sx, sy = self.screen.get_size()
+        for i in range(6):
+            sign = signs[i]
+            w, h = sign.get_size()
+            self.screen.blit(sign, (sx/2 - w/2, 30 + 70 * i))
+            box = sign.get_rect(topleft=(sx/2 - w/2, 30 + 70 * i))
+            boxes.append(box)
+
+        if mouse[0] and not self.menu_screen_mouse_lock:
+            self.menu_screen_mouse_lock = True
+            if boxes[1].colliderect(mouse_box):
+                self.load_level('saves/level_1')
+                self.scene = 'gameplay'
+            elif boxes[2].colliderect(mouse_box):
+                self.load_level('saves/level_2')
+                self.scene = 'gameplay'
+            elif boxes[3].colliderect(mouse_box):
+                self.load_level('saves/level_3')
+                self.scene = 'gameplay'
+            elif boxes[4].colliderect(mouse_box):
+                self.scene = 'loading_screen'
+            elif boxes[5].colliderect(mouse_box):
+                self.scene = 'menu'
+        elif not mouse[0] and self.menu_screen_mouse_lock:
+            self.menu_screen_mouse_lock = False
+
+        self.check_quit_in_menus()
 
     def pause(self):
         pygame.display.update()
