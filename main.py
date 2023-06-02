@@ -160,8 +160,7 @@ class Game:
         if mouse[0] and not self.menu_screen_mouse_lock:
             self.menu_screen_mouse_lock = True
             if play_box.colliderect(mouse_box):
-                self.scene = 'gameplay'
-                self.menu_screen_mouse_lock = True
+                self.scene = 'level_select'
             elif edit_box.colliderect(mouse_box):
                 self.scene = 'editor'
                 self.init_editor()
