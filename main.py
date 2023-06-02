@@ -16,7 +16,6 @@ class Game:
         self.enemy_counter = 0
         self.ground = 680
         self.menu_screen_mouse_lock = True
-        self.place_objects_lock = True
 
         self.bg = pygame.image.load('materials/images/background.png').convert_alpha()
         self.cursor_icon = pygame.image.load('materials/images/cursor.png').convert_alpha()
@@ -511,34 +510,6 @@ class Game:
                 self.player.get_hitboxes()
                 self.player.jump_height = 0
                 self.player.in_air = False
-
-        placing_objects_keys = [
-            keys[pygame.K_i],
-            keys[pygame.K_o],
-            keys[pygame.K_p],
-            keys[pygame.K_m],
-            keys[pygame.K_f],
-            keys[pygame.K_b],
-            keys[pygame.K_n]
-        ]
-
-        if not self.place_objects_lock:
-            if keys[pygame.K_i]:
-                self.place_object('low', 'enemy')
-            elif keys[pygame.K_o]:
-                self.place_object('high', 'enemy')
-            elif keys[pygame.K_p]:
-                self.place_object('circle', 'enemy')
-            elif keys[pygame.K_m]:
-                self.place_object('goblet', 'goblet')
-            elif keys[pygame.K_f]:
-                self.place_object('death_block', 'death_block')
-            elif keys[pygame.K_b]:
-                self.place_object('big_block', 'solid_block')
-            elif keys[pygame.K_n]:
-                self.place_object('small_block', 'solid_block')
-        elif not any(placing_objects_keys):
-            self.place_objects_lock = False
 
         if keys[pygame.K_ESCAPE]:
             self.player.shot_lock = True
