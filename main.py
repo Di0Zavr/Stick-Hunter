@@ -86,9 +86,8 @@ class Game:
                 code, x, y = obj[0], float(obj[1]), float(obj[2])
                 match code:
                     case '00':
-                        if self.last_scene == 'gameplay':
-                            self.player = Player(x=x, y=y, ammo=int(obj[3]), hp=int(obj[4]))
-                        elif self.last_scene == 'editor':
+                        self.player = Player(x=x, y=y, ammo=int(obj[3]), hp=int(obj[4]))
+                        if self.last_scene == 'editor':
                             self.editor_player_pos = (x, y)
                     case '01':
                         t = obj[3]
