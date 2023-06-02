@@ -2,7 +2,7 @@ import pygame
 
 
 class Player:
-    def __init__(self, x, y, ammo=6, hp=10):
+    def __init__(self, x, y, ammo=6, hp=5):
         self.speed = 4
         self.direction = 0
         self.ammo = ammo
@@ -58,7 +58,7 @@ class Player:
     def get_hitboxes(self):
         self.hitbox = pygame.Rect((self.x, self.y), (16, 32))
         self.head_hitbox = pygame.Rect((self.x, self.y), (16, 1))
-        self.leg_hitbox = pygame.Rect((self.x - 2, self.y + 32), (20, 1))
+        self.leg_hitbox = pygame.Rect((self.x, self.y + 32), (16, 1))
 
 
 class Bullet:

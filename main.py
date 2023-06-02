@@ -12,7 +12,7 @@ class Game:
 
         self.last_scene = ''
         self.scene = 'menu'
-        self.gravity = 0.2
+        self.gravity = 0.25
         self.enemy_counter = 0
         self.ground = 680
         self.menu_screen_mouse_lock = True
@@ -412,7 +412,9 @@ class Game:
             5: ('circle', 'enemy'),
             6: ('goblet', 'goblet'),
         }
-        if self.editor_current_obj == 7:
+        if self.editor_current_obj == -1:
+            pass
+        elif self.editor_current_obj == 7:
             self.editor_player_pos = (mx, my)
         else:
             obj_info = objects_dict.get(self.editor_current_obj)
@@ -546,7 +548,7 @@ class Game:
             self.last_scene = 'gameplay'
             self.scene = 'pause'
 
-    def place_object(self, var, obj_type, pos=None, en_hp=6, direction=None):
+    def place_object(self, var, obj_type, pos=None, en_hp=3, direction=None):
         if not pos:
             x, y = pygame.mouse.get_pos()
         else:
@@ -589,6 +591,8 @@ class Game:
         self.place_objects_lock = True
 
     def check_enemies(self):
+        if len(self.enemies_on_screen) == 0:
+            self.death_blocks_on_screen = []
         for enemy in self.enemies_on_screen:
             if enemy.health <= 0:
                 self.enemies_on_screen.remove(enemy)
