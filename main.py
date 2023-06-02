@@ -202,13 +202,13 @@ class Game:
         if mouse[0] and not self.menu_screen_mouse_lock:
             self.menu_screen_mouse_lock = True
             if boxes[1].colliderect(mouse_box):
-                self.load_level('saves/levels/level_1')
+                self.load_level('levels/level_1')
                 self.scene = 'gameplay'
             elif boxes[2].colliderect(mouse_box):
-                self.load_level('saves/levels/level_2')
+                self.load_level('levels/level_2')
                 self.scene = 'gameplay'
             elif boxes[3].colliderect(mouse_box):
-                self.load_level('saves/levels/level_3')
+                self.load_level('levels/level_3')
                 self.scene = 'gameplay'
             elif boxes[4].colliderect(mouse_box):
                 self.scene = 'loading_screen'
